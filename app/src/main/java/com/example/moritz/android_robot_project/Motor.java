@@ -4,6 +4,6 @@ public enum Motor {
     motorA,
     motorB,
     motorC,
-    motorF
+    motorG
 }
 ///Mo
