@@ -5,10 +5,7 @@ import android.hardware.usb.UsbManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 
@@ -39,6 +36,17 @@ public class MainActivity extends AppCompatActivity {
        NXT_USB.close();
     }
 
+    public void onBackPressed() {
+        setContentView(R.layout.activity_main);
+    }
+
+    public void btnQuali(View v){
+        setContentView(R.layout.activity_qualifikation);
+    }
+
+    public void btnStart(View v){
+        setContentView(R.layout.activity_start);
+    }
 
 
     //---------------------------------------------------------------
@@ -47,18 +55,24 @@ public class MainActivity extends AppCompatActivity {
     //---------------------------------------------------------------
 
 
-
-    public void btnStart(View v)
+    public void btn_quali_Start(View v)
     {
-        startMotor(Motor.motorB,100);
-        startMotor(Motor.motorC,100);
+        TextView status = findViewById(R.id.textViewStatus);
+        status.setText("Motoren gestartet");
+        startMotor(Motor.motorB,80);
+        startMotor(Motor.motorC,80);
+
     }
 
-    public void btnStop(View v)
+    public void btn_quali_Stop(View v)
     {
+        TextView status = findViewById(R.id.textViewStatus);
+        status.setText("Motoren gestoppt");
         stopMotor(Motor.motorB);
         stopMotor(Motor.motorC);
     }
+
+
 
 
     public  void startMotor(Motor motor, int speed){
@@ -77,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             //Mode Motor an
             bytes[4] = (byte) (0x01);
             //Regulation Mode: no Regulation
-            bytes[5] = (byte) (0x00);
+            bytes[5] = (byte) (0x02);
             //Turn Ratio: 0
             bytes[6] = (byte) (0x00);
             //RunState: 20 Motor running
@@ -92,6 +106,26 @@ public class MainActivity extends AppCompatActivity {
 
             Log.i("NXT", "playTone " + res + " " + bytes[0] + " " + bytes[1] + " " + bytes[2]);
         }
+
+    }
+
+    public void getRotation(Motor motor){
+        if(NXT_USB.isConnected()){
+            byte[] bytes = new byte[64];
+            bytes[0] = (byte) (0x00);//Fix
+            bytes[1] = (byte) (0x06);
+            switch(motor){
+                case motorA: bytes[2] = (byte) (0x00);break;
+                case motorB: bytes[2] = (byte) (0x01);break;
+                case motorC: bytes[2] = (byte) (0x02);break;
+            }
+            boolean res = NXT_USB.command(bytes, 3, bytes, 25);
+            TextView status = findViewById(R.id.textViewStatus);
+            status.setText("" + bytes[22]);
+
+            Log.i("NXT", "Rotation " + res + " " + bytes[21] + " " + bytes[22] + " " + bytes[23] + " " + bytes[24]);
+        }
+
     }
 
     public  void stopMotor(Motor motor){
@@ -125,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
 
             Log.i("NXT", "playTone " + res + " " + bytes[0] + " " + bytes[1] + " " + bytes[2]);
         }
+
+
     }
 
 
