@@ -15,6 +15,18 @@ import java.util.Iterator;
 public class USB
 {
     //---------------------------------------------------------------
+    private UsbManager mUsbManager;
+    private UsbDevice mDevice;
+    private UsbDeviceConnection mConnection;
+
+    private UsbEndpoint epOUT;
+    private UsbEndpoint epIN;
+
+    //---------------------------------------------------------------
+    private boolean usbConnected = false;
+    private static final String TAG = "NXT_USB";
+
+    //---------------------------------------------------------------
     public USB()
     {
     }
@@ -135,15 +147,5 @@ public class USB
         return( false );
     }
 
-    //---------------------------------------------------------------
-    private UsbManager mUsbManager;
-    private UsbDevice mDevice;
-    private UsbDeviceConnection mConnection;
 
-    private UsbEndpoint epOUT;
-    private UsbEndpoint epIN;
-
-    //---------------------------------------------------------------
-    private boolean usbConnected = false;
-    private static final String TAG = "NXT_USB";
 }
