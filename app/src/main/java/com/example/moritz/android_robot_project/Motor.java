@@ -1,6 +1,7 @@
 package com.example.moritz.android_robot_project;
 
 import android.util.Log;
+import java.math.*;
 
 import com.example.moritz.android_robot_project.Enums.*;
 
@@ -40,8 +41,15 @@ public class Motor {
 
     }
 
-    public void turn(byte speed, byte turnRatio){
-        nxt.setOutputState(this.port, speed, this.mode, this.regulationMode, turnRatio, this.runState,  0);
+    public void turn(byte speed, int degree){
+
+        int x = getRotation();
+        nxt.setOutputState(this.port, speed, this.mode, this.regulationMode, (byte)100, this.runState,  0);
+        while(Math.abs(x-getRotation()) <= ((int)(degree * 4.6))){}
+
+
+
+
     }
 
     public void setMode(Mode mode) {
@@ -57,10 +65,15 @@ public class Motor {
     }
 
     public int getRotation(){
-        String x;
         byte[] get = nxt.getOutputState(this.port);
-       x = get[24] + get[23] + get[22] + get[21]  + "";
-        return Integer.parseInt(x);
+
+        int x = (int) ((int) get[21] &0xff)
+                      |((int) get[22] &0xff) <<8
+                      | ((int) get[23] &0xff) <<16
+                      | ((int) get[24] &0xff) << 24;
+      return x;
     }
+
+
 
 }

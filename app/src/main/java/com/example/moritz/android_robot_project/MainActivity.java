@@ -74,9 +74,12 @@ public class MainActivity extends AppCompatActivity {
     public void btn_quali_Start(View v) {
         TextView status = findViewById(R.id.textViewStatus);
         status.setText("Motoren gestartet");
+        try {
+            quali();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        rob.moveForward((byte) 25);
-      //  rob.turn(25,100);
 
     }
 
@@ -84,6 +87,31 @@ public class MainActivity extends AppCompatActivity {
         TextView status = findViewById(R.id.textViewStatus);
         status.setText("Motoren gestoppt");
         rob.stop();
+
+    }
+
+
+    public void quali() throws InterruptedException {
+
+        rob.moveForwardFor((byte)50, 100);
+        rob.stop();
+        rob.turn((byte)50,90);
+        rob.stop();
+        rob.moveForwardFor((byte)50, 50);
+        rob.stop();
+        rob.turn((byte)50,90);
+        rob.stop();
+        rob.moveForwardFor((byte)50, 100);
+        rob.stop();
+        rob.turn((byte)50,90);
+        rob.stop();
+        rob.moveForwardFor((byte)50, 50);
+        rob.stop();
+        rob.turn((byte)50,90);
+        rob.stop();
+
+
+
 
     }
 
