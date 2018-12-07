@@ -2,21 +2,29 @@ package com.example.moritz.android_robot_project;
 
 import android.content.Context;
 import android.hardware.usb.UsbManager;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
-import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.example.moritz.android_robot_project.Enums.Mode;
+import com.example.moritz.android_robot_project.Enums.Port;
+import com.example.moritz.android_robot_project.Enums.RegulationMode;
+import com.example.moritz.android_robot_project.Enums.RunState;
 
 
 public class MainActivity extends AppCompatActivity {
     USB NXT_USB;
+    NXT nxt;
+    Motor a,b;
+    Robot rob;
 
-    public MainActivity(){
-         NXT_USB = new USB();
+
+
+    public MainActivity() {
+        NXT_USB = new USB();
     }
 
     @Override
@@ -24,21 +32,37 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         NXT_USB.init((UsbManager) getSystemService(Context.USB_SERVICE));
+        nxt = NXT.getInstance(NXT_USB);
+        a = new Motor(nxt,Port.PORTA,Mode.MOTORON_BREAK,RegulationMode.IDLE,RunState.RUNNING);
+        b = new Motor(nxt,Port.PORTB,Mode.MOTORON_BREAK,RegulationMode.IDLE,RunState.RUNNING);
+        a.synchronisation(b);
+        rob = new Robot();
+        rob.addMotor(a);
+        rob.addMotor(b);
     }
 
-    protected  void onResume()
-    {
+    protected void onResume() {
         super.onResume();
         NXT_USB.open(getIntent());
     }
 
 
-    public void onPause()
-    {
-       super.onPause();
-       NXT_USB.close();
+    public void onPause() {
+        super.onPause();
+        NXT_USB.close();
     }
 
+    public void onBackPressed() {
+        setContentView(R.layout.activity_main);
+    }
+
+    public void btnQuali(View v) {
+        setContentView(R.layout.activity_qualifikation);
+    }
+
+    public void btnStart(View v) {
+        setContentView(R.layout.activity_start);
+    }
 
 
     //---------------------------------------------------------------
@@ -47,87 +71,49 @@ public class MainActivity extends AppCompatActivity {
     //---------------------------------------------------------------
 
 
-
-    public void btnStart(View v)
-    {
-        startMotor(Motor.motorB,100);
-        startMotor(Motor.motorC,100);
-    }
-
-    public void btnStop(View v)
-    {
-        stopMotor(Motor.motorB);
-        stopMotor(Motor.motorC);
-    }
-
-
-    public  void startMotor(Motor motor, int speed){
-        if(NXT_USB.isConnected()){
-            byte[] bytes = new byte[64];
-            bytes[0] = (byte) (0x00);//Fix
-            bytes[1] = (byte) (0x04);//Fix
-            //Port definieren
-            switch(motor){
-                case motorA: bytes[2] = (byte) (0x00);break;
-                case motorB: bytes[2] = (byte) (0x01);break;
-                case motorC: bytes[2] = (byte) (0x02);break;
-            }
-            //Speed definieren
-            bytes[3] = (byte) (speed);
-            //Mode Motor an
-            bytes[4] = (byte) (0x01);
-            //Regulation Mode: no Regulation
-            bytes[5] = (byte) (0x00);
-            //Turn Ratio: 0
-            bytes[6] = (byte) (0x00);
-            //RunState: 20 Motor running
-            bytes[7] = (byte) (0x20);
-            //Tacholimit: 0 läuft für immer
-            bytes[8] = (byte) (0x00);
-            bytes[9] = (byte) (0x00);
-            bytes[10] = (byte) (0x00);
-            bytes[11] = (byte) (0x00);
-            bytes[12] = (byte) (0x00);
-            boolean res = NXT_USB.command(bytes, 13, bytes, 3);
-
-            Log.i("NXT", "playTone " + res + " " + bytes[0] + " " + bytes[1] + " " + bytes[2]);
+    public void btn_quali_Start(View v) {
+        TextView status = findViewById(R.id.textViewStatus);
+        status.setText("Motoren gestartet");
+        try {
+            quali();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
+
     }
 
-    public  void stopMotor(Motor motor){
-        if(NXT_USB.isConnected()){
-            byte[] bytes = new byte[64];
-            bytes[0] = (byte) (0x00);//Fix
-            bytes[1] = (byte) (0x04);//Fix
-            //Port definieren
-            switch(motor){
-                case motorA: bytes[2] = (byte) (0x00);break;
-                case motorB: bytes[2] = (byte) (0x01);break;
-                case motorC: bytes[2] = (byte) (0x02);break;
-            }
-            //Speed definieren
-            bytes[3] = (byte) (0x00);
-            //Mode Motor an
-            bytes[4] = (byte) (0x02);
-            //Regulation Mode: no Regulation
-            bytes[5] = (byte) (0x02);
-            //Turn Ratio: 0
-            bytes[6] = (byte) (0x00);
-            //RunState: 20 Motor running
-            bytes[7] = (byte) (0x20);
-            //Tacholimit: 0 läuft für immer
-            bytes[8] = (byte) (0x00);
-            bytes[9] = (byte) (0x00);
-            bytes[10] = (byte) (0x00);
-            bytes[11] = (byte) (0x00);
-            bytes[12] = (byte) (0x00);
-            boolean res = NXT_USB.command(bytes, 13, bytes, 3);
+    public void btn_quali_Stop(View v) {
+        TextView status = findViewById(R.id.textViewStatus);
+        status.setText("Motoren gestoppt");
+        rob.stop();
 
-            Log.i("NXT", "playTone " + res + " " + bytes[0] + " " + bytes[1] + " " + bytes[2]);
-        }
     }
 
 
+    public void quali() throws InterruptedException {
+
+        rob.moveForwardFor((byte)50, 100);
+        rob.stop();
+        rob.turn((byte)50,90);
+        rob.stop();
+        rob.moveForwardFor((byte)50, 50);
+        rob.stop();
+        rob.turn((byte)50,90);
+        rob.stop();
+        rob.moveForwardFor((byte)50, 100);
+        rob.stop();
+        rob.turn((byte)50,90);
+        rob.stop();
+        rob.moveForwardFor((byte)50, 50);
+        rob.stop();
+        rob.turn((byte)50,90);
+        rob.stop();
+
+
+
+
+    }
 
 
 }
