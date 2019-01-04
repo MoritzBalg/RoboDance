@@ -87,4 +87,10 @@ public class Robot {
     public void setCm(int cm) {
         this.cm = cm;
     }
+
+    public void playGefunden() {
+        NXT nxt = NXT.getInstance();
+        nxt.playTone(400,300);
+
+    }
 }

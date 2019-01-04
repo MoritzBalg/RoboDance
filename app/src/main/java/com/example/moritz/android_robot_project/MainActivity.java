@@ -148,6 +148,14 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case 1:
                                 textViewKamera.setText("Grün");
+                                try {
+                                    Thread.sleep(500);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                rob.stop();
+                                rob.playGefunden();
+
                                 break;
                             case 2:
                                 textViewKamera.setText("Rot");
