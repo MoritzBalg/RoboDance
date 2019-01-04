@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         battery.setProgress(getBattery());
                         speed.setText(rob.getSpeed() + "%");
-                        status.setText(NXT_USB.isConnected()?"Verbunden":"nicht verbunden");
+                        status.setText(NXT_USB.isConnected()?"aktiv":"inaktiv");
                         strecke.setText("");
                         sync.setText(Motor.isSync()?"aktiv":"inaktiv");
                     }
