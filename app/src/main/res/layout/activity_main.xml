@@ -122,7 +122,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textViewSpeed" />
 
     <TextView
-        android:id="@+id/textViewStrecke"
+        android:id="@+id/textViewKamera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -141,7 +141,7 @@
         android:textColor="@color/colorLabel"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/textView6"
-        app:layout_constraintTop_toBottomOf="@+id/textViewStrecke" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewKamera" />
 
     <Button
         android:id="@+id/button2"
@@ -257,5 +257,19 @@
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/guideline4"
         tools:progress="40" />
+
+    <FrameLayout
+        android:id="@+id/camera_preview"
+        android:layout_width="185dp"
+        android:layout_height="185dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline6">
+
+    </FrameLayout>
 
 </android.support.constraint.ConstraintLayout>

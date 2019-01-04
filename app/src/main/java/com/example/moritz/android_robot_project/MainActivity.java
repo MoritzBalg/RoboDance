@@ -2,15 +2,13 @@ package com.example.moritz.android_robot_project;
 
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -18,6 +16,9 @@ import com.example.moritz.android_robot_project.Enums.Mode;
 import com.example.moritz.android_robot_project.Enums.Port;
 import com.example.moritz.android_robot_project.Enums.RegulationMode;
 import com.example.moritz.android_robot_project.Enums.RunState;
+import android.hardware.Camera;
+
+import static com.example.moritz.android_robot_project.CameraPreview.getCameraInstance;
 
 public class MainActivity extends AppCompatActivity {
     public USB NXT_USB;
@@ -33,12 +34,25 @@ public class MainActivity extends AppCompatActivity {
     private TextView log;
     private SeekBar seekbar ;
     private Handler mainHandler = new Handler();
+    private Handler kameraHandler = new Handler();
 
+
+    private Camera mCamera;
+    private CameraPreview mPreview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Kamera
+        mCamera = CameraPreview.getCameraInstance();
+        // Create our Preview view and set it as the content of our activity.
+        mPreview = new CameraPreview(this, mCamera);
+        mCamera.setPreviewCallback(mPreview);
+        //mPreview.onPreviewFrame(a, mCamera);
+        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        preview.addView(mPreview);
 
         NXT_USB = new USB();
         NXT_USB.init((UsbManager) getSystemService(Context.USB_SERVICE));
@@ -52,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         battery = (ProgressBar)findViewById(R.id.progressBar);
         speed = (TextView) findViewById(R.id.textViewSpeed);
         status = (TextView) findViewById(R.id.textViewStat);
-        strecke = (TextView) findViewById(R.id.textViewStrecke);
+        strecke = (TextView) findViewById(R.id.textViewKamera);
         sync = (TextView) findViewById(R.id.textViewSync);
         log = (TextView) findViewById(R.id.log);
         log.setMovementMethod(new ScrollingMovementMethod());
@@ -102,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void btnStart(View v){
         rob.moveForward();
+        FarbErkennung fb = new FarbErkennung();
+        fb.start();
     }
 
     public void btnStop(View v){
@@ -111,6 +127,42 @@ public class MainActivity extends AppCompatActivity {
 
     public void writeLog(String s){
         log.setText(log.getText() + "\n" + s);
+    }
+
+
+    class FarbErkennung extends Thread {
+        private static final String TAG = "MainActivity";
+
+        @Override
+        public void run() {
+            while (true) {
+                kameraHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int isFarbe = mPreview.isFarbe();
+                        int[] RGB = mPreview.Farbe(0,0);
+                        TextView textViewKamera = (TextView) findViewById(R.id.textViewKamera);
+                        switch (isFarbe){
+                            case 0:
+                                textViewKamera.setText("undefiniert");
+                                break;
+                            case 1:
+                                textViewKamera.setText("Grün");
+                                break;
+                            case 2:
+                                textViewKamera.setText("Rot");
+                                break;
+                        }
+                    }
+
+                });
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     //
