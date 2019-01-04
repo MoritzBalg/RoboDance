@@ -2,39 +2,41 @@ package com.example.moritz.android_robot_project;
 
 import java.util.ArrayList;
 
+
 public class Robot {
     private ArrayList<Motor> motoren = new ArrayList<>();
     //private Sensor[] sensors;
-    boolean running;
+    private boolean running;
+    private byte speed;
+    private int cm;
 
-    public Robot(){}
+    public Robot(){
+        this.cm = 0;
+    }
 
     public void addMotor(Motor motor){
         motoren.add(motor);
     }
 
-    public void moveForward(byte speed){
+    public void moveForward(){
         for(Motor m: motoren){
             m.start(speed);
         }
     }
 
-    public void moveForwardFor(byte speed, double cm){
-        int ticks = (int) (20.45 * cm);
-        int state = getRotation();
-        moveForward((byte) speed);
+    public void moveForwardFor(double cm){
+        int ticks = (int) (20.4627 * cm);
+        int state = motoren.get(0).getRotation();
+        moveForward();
 
-        int current = getRotation();
+        int current = motoren.get(0).getRotation();
         while (!(Math.abs(state-current) >= ticks)){
-            current = getRotation();
+            current = motoren.get(0).getRotation();
         }
-
-
-
-
+        stop();
     }
 
-    public void moveBackward(byte speed){
+    public void moveBackward(){
         speed *=-1;
         for(Motor m: motoren){
             m.start(speed);
@@ -48,17 +50,41 @@ public class Robot {
 
     }
 
-    public void turn(int speed ,int degrees){
-        /*for(Motor m: motoren){
-            m.turn((byte)speed, degrees);
-        }*/
-        motoren.get(0).turn((byte)speed,degrees);
+    public void turn(int degrees){
+        stop();
+
+        int ticks = (int)(2.02*(double)degrees);
+        Motor a = motoren.get(0);
+        Motor b = motoren.get(1);
+        Motor.setSync(false);
+        int state = a.getRotation();
+        a.start((byte)25);
+        b.start((byte)25);
+        while(Math.abs(state-a.getRotation())<= ticks){
+        }
+        a.stop();
+        b.stop();
+        Motor.setSync(true);
+
     }
 
-    public int getRotation(){
-        return  motoren.get(0).getRotation();
+
+    public void setSpeed(byte speed) {
+        this.speed = speed;
+
+    }
+
+    public byte getSpeed() {
+
+        return speed;
     }
 
 
+    public int getCm() {
+        return cm;
+    }
 
+    public void setCm(int cm) {
+        this.cm = cm;
+    }
 }

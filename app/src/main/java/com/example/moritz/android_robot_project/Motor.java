@@ -11,6 +11,7 @@ public class Motor {
     private Mode mode;
     private RegulationMode regulationMode;
     private RunState runState;
+    private static boolean sync;
 
     public Motor(NXT nxt, Port port, Mode mode, RegulationMode regulationMode, RunState runState) {
         this.nxt = nxt;
@@ -18,19 +19,33 @@ public class Motor {
         this.mode = mode;
         this.regulationMode = regulationMode;
         this.runState = runState;
+        sync = (regulationMode == RegulationMode.SYNC) ? true: false;
+
     }
 
     public void start(byte speed){
+        nxt.resetMotorPosition(this.port, true);
+        if(sync){this.regulationMode = RegulationMode.SYNC;}else{
+            this.regulationMode = RegulationMode.SPEED;
+        }
         nxt.setOutputState(this.port, speed, this.mode, this.regulationMode, (byte)0, this.runState,  0);
     }
 
 
-    public void stop(){
-        nxt.setOutputState(this.port, (byte)0, this.mode, RegulationMode.IDLE, (byte)0, RunState.IDLE,  0);
-        nxt.resetMotorPosition(this.port, true);
+    public RegulationMode getRegulationMode() {
+        return regulationMode;
     }
 
-    public void synchronisation(Motor motor){
+    public static boolean isSync() {
+        return sync;
+    }
+
+    public void stop(){
+        nxt.setOutputState(this.port, (byte)0, this.mode, this.regulationMode, (byte)0, this.runState,  0);
+
+    }
+
+   /* public void synchronisation(Motor motor){
         //Modus der beiden Motoren aktivieren
         this.setMode(Mode.MOTORON_BREAK_REGULATED);
         motor.setMode(Mode.MOTORON_BREAK_REGULATED);
@@ -39,6 +54,11 @@ public class Motor {
         this.setRegulationMode(RegulationMode.SYNC);
         motor.setRegulationMode(RegulationMode.SYNC);
 
+    }
+*/
+
+    public static void setSync(boolean value){
+        sync = value;
     }
 
     public void turn(byte speed, int degree){
