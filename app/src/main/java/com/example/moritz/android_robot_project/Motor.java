@@ -41,8 +41,8 @@ public class Motor {
     }
 
     public void stop(){
-        nxt.setOutputState(this.port, (byte)0, this.mode, this.regulationMode, (byte)0, this.runState,  0);
-
+        //nxt.setOutputState(this.port, (byte)0, this.mode, this.regulationMode, (byte)0, this.runState,  0);
+        this.start((byte)0);
     }
 
    /* public void synchronisation(Motor motor){

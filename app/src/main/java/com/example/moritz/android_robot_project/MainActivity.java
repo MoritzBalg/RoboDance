@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar seekbar ;
     private Handler mainHandler = new Handler();
     private Handler kameraHandler = new Handler();
+    private Handler fahrHandler = new Handler();
 
 
     private Camera mCamera;
@@ -114,15 +116,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     FarbErkennung fb = new FarbErkennung();
+    Fahren fahr = new Fahren();
 
     public void btnStart(View v){
-        rob.moveFor();
         fb.start();
+        fahr.start();
     }
 
     public void btnStop(View v){
-        fb.stop();
        rob.stop();
+       fb.interrupt();
+       fahr.interrupt();
     }
 
     public void writeLog(String s){
@@ -130,17 +134,54 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    class FarbErkennung extends Thread {
+    class Fahren extends Thread {
         private static final String TAG = "MainActivity";
 
         @Override
         public void run() {
+            rob.moveFor();
             while (true) {
+                fahrHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int isFarbe = fb.getFarbe();
+                        TextView textViewKamera = (TextView) findViewById(R.id.textViewKamera);
+                        switch (isFarbe){
+                            case 0:
+                                break;
+                            case 1:
+                                rob.stop();
+                                break;
+                            case 2:
+                               rob.outLimit();
+                               break;
+                        }
+                    }
+
+                });
+                try {
+                    fahr.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    class FarbErkennung extends Thread {
+        private static final String TAG = "MainActivity";
+        int isFarbe =0;
+        public int getFarbe(){
+            return this.isFarbe;
+        }
+        @Override
+        public void run() {
+            while (true) {
+                if(this.isInterrupted()){return;}
                 kameraHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        int isFarbe = mPreview.isFarbe();
-                        int[] RGB = mPreview.Farbe(0,0);
+                        isFarbe = mPreview.isFarbe();
                         TextView textViewKamera = (TextView) findViewById(R.id.textViewKamera);
                         switch (isFarbe){
                             case 0:
@@ -148,18 +189,9 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case 1:
                                 textViewKamera.setText("Grün");
-                                try {
-                                    Thread.sleep(500);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                                rob.stop();
-                                rob.playGefunden();
-
                                 break;
                             case 2:
                                 textViewKamera.setText("Rot");
-                                rob.outLimit();
                                 break;
                         }
                     }

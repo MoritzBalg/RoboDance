@@ -68,16 +68,30 @@ public class Robot {
     }
 
     public void outLimit(){
-        this.stop();
-        this.moveBack();
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        this.stop();
-        turn(40);
-        this.stop();
-        this.moveFor();
+
     }
+
+    private class OUTLIMIT extends Thread{
+        Robot rob;
+
+        public OUTLIMIT(Robot rob){
+            this.rob = rob;
+        }
+
+        @Override
+        public void run() {
+            rob.stop();
+            rob.moveBack();
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            rob.stop();
+            rob.turn(40);
+            rob.stop();
+            rob.moveFor();
+        }
+    }
+
 }
