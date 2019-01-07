@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     FarbErkennung fb = new FarbErkennung();
 
     public void btnStart(View v){
-        rob.moveForward();
+        rob.moveFor();
         fb.start();
     }
 
@@ -159,10 +159,7 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case 2:
                                 textViewKamera.setText("Rot");
-                                rob.stop();
-                                rob.moveForwardFor(-5);
-                                rob.turn(40);
-                                rob.moveForwardFor(2);
+                                rob.outLimit();
                                 break;
                         }
                     }
