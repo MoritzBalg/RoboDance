@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.example.moritz.android_robot_project.Enums.Farbe;
+
 import java.io.IOException;
 
 import static android.content.ContentValues.TAG;
@@ -166,21 +168,21 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
 
-     public int isFarbe(){
+     public Farbe isFarbe(){
         Foto();
         //0 = Nichts; 1 = Gruen; 2 = Rot
         for(int i = 0; i<(frameWidth/5); i+=5){
             for(int j =0; j<frameHeight; j+=100){
                 int[] color = Farbe(i,j);
                 if(color[0] > 200&&color[1]< 100 && color[2]<100){
-                    return 2;
+                    return Farbe.ROT;
                 }
                 if(color[0] < 100&&color[1]> 200 && color[2]<200){
-                    return 1;
+                    return Farbe.GRUEN;
                 }
             }
         }
-        return 0;
+        return Farbe.UNDEFINIERT;
     }
 
 

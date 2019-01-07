@@ -13,6 +13,8 @@ import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import com.example.moritz.android_robot_project.Enums.Farbe;
 import com.example.moritz.android_robot_project.Enums.Mode;
 import com.example.moritz.android_robot_project.Enums.Port;
 import com.example.moritz.android_robot_project.Enums.RegulationMode;
@@ -125,17 +127,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void btnStop(View v){
        rob.stop();
-       fb.interrupt();
-       fahr.interrupt();
     }
 
-    public void writeLog(String s){
-        log.setText(log.getText() + "\n" + s);
-    }
 
 
     class Fahren extends Thread {
-        private static final String TAG = "MainActivity";
 
         @Override
         public void run() {
@@ -144,15 +140,15 @@ public class MainActivity extends AppCompatActivity {
                 fahrHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        int isFarbe = fb.getFarbe();
+                        Farbe isFarbe = fb.getFarbe();
                         TextView textViewKamera = (TextView) findViewById(R.id.textViewKamera);
                         switch (isFarbe){
-                            case 0:
+                            case UNDEFINIERT:
                                 break;
-                            case 1:
+                            case GRUEN:
                                 rob.stop();
                                 break;
-                            case 2:
+                            case ROT:
                                rob.outLimit();
                                break;
                         }
@@ -170,8 +166,8 @@ public class MainActivity extends AppCompatActivity {
 
     class FarbErkennung extends Thread {
         private static final String TAG = "MainActivity";
-        int isFarbe =0;
-        public int getFarbe(){
+        Farbe isFarbe = Farbe.UNDEFINIERT;
+        public Farbe getFarbe(){
             return this.isFarbe;
         }
         @Override
@@ -184,13 +180,13 @@ public class MainActivity extends AppCompatActivity {
                         isFarbe = mPreview.isFarbe();
                         TextView textViewKamera = (TextView) findViewById(R.id.textViewKamera);
                         switch (isFarbe){
-                            case 0:
+                            case UNDEFINIERT:
                                 textViewKamera.setText("undefiniert");
                                 break;
-                            case 1:
+                            case GRUEN:
                                 textViewKamera.setText("Grün");
                                 break;
-                            case 2:
+                            case ROT:
                                 textViewKamera.setText("Rot");
                                 break;
                         }
