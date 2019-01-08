@@ -19,10 +19,24 @@ public class Robot {
         }
     }
 
+    public void reverse(){
+        this.speed*=-1;
+        this.moveFor();
+        this.speed*=-1;
+
+    }
+
     public void moveBack(){
-        this.speed *= -1;
-            moveFor();
-        this.speed *= -1;
+        int ticks = (int)(360);
+        Motor a = motoren.get(0);
+        Motor b = motoren.get(1);
+        int state = a.getRotation();
+        a.start((byte) -50);
+        b.start((byte) -50);
+        while(Math.abs(state-a.getRotation())<= ticks){
+        }
+        a.stop();
+        b.stop();
 
     }
 
@@ -67,9 +81,6 @@ public class Robot {
         nxt.playTone(400,300);
     }
 
-    public void outLimit(){
-
-    }
 
     private class OUTLIMIT extends Thread{
         Robot rob;

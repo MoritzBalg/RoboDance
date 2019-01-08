@@ -26,8 +26,8 @@ import static com.example.moritz.android_robot_project.CameraPreview.getCameraIn
 public class MainActivity extends AppCompatActivity {
     public USB NXT_USB;
     public NXT nxt;
-    public Motor a,b;
-    public Robot rob;
+   // public Motor a,b;
+    //public Robot rob;
     public int x;
     private ProgressBar battery;
     private TextView speed;
@@ -61,12 +61,7 @@ public class MainActivity extends AppCompatActivity {
         NXT_USB = new USB();
         NXT_USB.init((UsbManager) getSystemService(Context.USB_SERVICE));
         nxt = NXT.getInstance(NXT_USB);
-        a = new Motor(nxt,Port.PORTA,Mode.MOTORON_BREAK_REGULATED,RegulationMode.SYNC,RunState.RUNNING);
-        b = new Motor(nxt,Port.PORTB,Mode.MOTORON_BREAK_REGULATED,RegulationMode.SYNC,RunState.RUNNING);
-        rob = new Robot();
-        rob.setSpeed((byte)20);
-        rob.addMotor(a);
-        rob.addMotor(b);
+
         battery = (ProgressBar)findViewById(R.id.progressBar);
         speed = (TextView) findViewById(R.id.textViewSpeed);
         status = (TextView) findViewById(R.id.textViewStat);
@@ -75,11 +70,11 @@ public class MainActivity extends AppCompatActivity {
         log = (TextView) findViewById(R.id.log);
         log.setMovementMethod(new ScrollingMovementMethod());
         seekbar = (SeekBar) findViewById(R.id.seekBar);
-        seekbar.setProgress(rob.getSpeed());
+      //  seekbar.setProgress(rob.getSpeed());
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                rob.setSpeed((byte)progress);
+             //   rob.setSpeed((byte)progress);
 
             }
 
@@ -94,9 +89,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //Tread Management
-        StatusControll sc = new StatusControll();
-
-        sc.start();
+        //StatusControll sc = new StatusControll();
+        //sc.start();
 
     }
 
@@ -117,59 +111,61 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this,MainActivity.class));
     }
 
-    FarbErkennung fb = new FarbErkennung();
-    Fahren fahr = new Fahren();
+   // FarbErkennung fb = new FarbErkennung();
 
     public void btnStart(View v){
-        fb.start();
+    //    fb.start();
+        Fahren fahr = new Fahren();
         fahr.start();
     }
 
     public void btnStop(View v){
-       rob.stop();
     }
 
 
 
     class Fahren extends Thread {
+        Robot rob;
+        Motor a,b;
+
+        public Fahren(){
+            rob = new Robot();
+            a = new Motor(nxt,Port.PORTA,Mode.MOTORON_BREAK_REGULATED,RegulationMode.SYNC,RunState.RUNNING);
+            b = new Motor(nxt,Port.PORTB,Mode.MOTORON_BREAK_REGULATED,RegulationMode.SYNC,RunState.RUNNING);
+            rob.setSpeed((byte)30);
+            rob.addMotor(a);
+            rob.addMotor(b);
+
+        }
+
 
         @Override
         public void run() {
+
             rob.moveFor();
             while (true) {
-                fahrHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Farbe isFarbe = fb.getFarbe();
-                        TextView textViewKamera = (TextView) findViewById(R.id.textViewKamera);
-                        switch (isFarbe){
+                        switch (mPreview.isFarbe()){
                             case UNDEFINIERT:
+
                                 break;
                             case GRUEN:
-                                rob.stop();
+                                //rob.stop();
                                 break;
                             case ROT:
-                               rob.outLimit();
+                                rob.moveBack();
+                                rob.turn(60);
+                                rob.moveFor();
+
                                break;
                         }
                     }
-
-                });
-                try {
-                    fahr.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
-        }
-    }
 
+
+    }
+/*
     class FarbErkennung extends Thread {
         private static final String TAG = "MainActivity";
-        Farbe isFarbe = Farbe.UNDEFINIERT;
-        public Farbe getFarbe(){
-            return this.isFarbe;
-        }
         @Override
         public void run() {
             while (true) {
@@ -177,9 +173,9 @@ public class MainActivity extends AppCompatActivity {
                 kameraHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        isFarbe = mPreview.isFarbe();
+
                         TextView textViewKamera = (TextView) findViewById(R.id.textViewKamera);
-                        switch (isFarbe){
+                        switch (mPreview.isFarbe()){
                             case UNDEFINIERT:
                                 textViewKamera.setText("undefiniert");
                                 break;
@@ -201,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
+*/
     //
     class StatusControll extends Thread{
         private static final String TAG = "MainActivity";
@@ -212,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         battery.setProgress(getBattery());
-                        speed.setText(rob.getSpeed() + "%");
+                       // speed.setText(rob.getSpeed() + "%");
                         status.setText(NXT_USB.isConnected()?"aktiv":"inaktiv");
                         strecke.setText("");
                         sync.setText(Motor.isSync()?"aktiv":"inaktiv");
