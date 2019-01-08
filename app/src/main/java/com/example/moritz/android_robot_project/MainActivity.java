@@ -149,7 +149,8 @@ public class MainActivity extends AppCompatActivity {
 
                                 break;
                             case GRUEN:
-                                //rob.stop();
+                                rob.stop();
+                                rob.playGefunden();
                                 break;
                             case ROT:
                                 rob.moveBack();
