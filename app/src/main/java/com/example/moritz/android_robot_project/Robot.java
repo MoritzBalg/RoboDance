@@ -47,7 +47,7 @@ public class Robot {
 
     }
 
-    public void turn(int degrees){
+    public void turn_RECHTS(int degrees){
         stop();
         int ticks = (int)(2.02*(double)degrees);
         Motor a = motoren.get(0);
@@ -56,6 +56,23 @@ public class Robot {
         int state = a.getRotation();
         a.start((byte)25);
         b.start((byte)-25);
+        while(Math.abs(state-a.getRotation())<= ticks){
+        }
+        a.stop();
+        b.stop();
+        Motor.setSync(true);
+
+    }
+
+    public void turn_LINKS(int degrees){
+        stop();
+        int ticks = (int)(2.02*(double)degrees);
+        Motor a = motoren.get(0);
+        Motor b = motoren.get(1);
+        Motor.setSync(false);
+        int state = a.getRotation();
+        a.start((byte)-25);
+        b.start((byte)25);
         while(Math.abs(state-a.getRotation())<= ticks){
         }
         a.stop();
@@ -99,7 +116,7 @@ public class Robot {
                 e.printStackTrace();
             }
             rob.stop();
-            rob.turn(40);
+            rob.turn_RECHTS(40);
             rob.stop();
             rob.moveFor();
         }

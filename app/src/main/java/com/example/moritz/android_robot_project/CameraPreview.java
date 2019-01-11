@@ -156,6 +156,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         bmp = Bitmap.createBitmap(rgb, frameWidth, frameHeight, Bitmap.Config.RGB_565);
     }
 
+
     public int[] Farbe(int x, int y) {
 
         int pixel = bmp.getPixel(x,y);
@@ -168,6 +169,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
 
+
+
      public Farbe isFarbe(){
         Foto();
         //0 = Nichts; 1 = Gruen; 2 = Rot
@@ -175,9 +178,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             for(int j =0; j<frameHeight; j+=100){
                 int[] color = Farbe(i,j);
                 if(color[0] > 200&&color[1]< 100 && color[2]<100){
-                    return Farbe.ROT;
+                    if(i>(int)(frameWidth/2)) {
+                        return Farbe.ROT_RECHTS;
+                    }else{
+                        return Farbe.ROT_LINKS;
+                    }
                 }
-                if(color[0] < 100&&color[1]> 200 && color[2]<200){
+                if(color[0] < 100&&color[1]> 150 && color[2]<100){
                     return Farbe.GRUEN;
                 }
             }

@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar battery;
     private TextView speed;
     private TextView status;
-    private TextView strecke;
+    private TextView textViewKamera;
     private TextView sync;
     private TextView log;
     private SeekBar seekbar ;
@@ -65,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
         battery = (ProgressBar)findViewById(R.id.progressBar);
         speed = (TextView) findViewById(R.id.textViewSpeed);
         status = (TextView) findViewById(R.id.textViewStat);
-        strecke = (TextView) findViewById(R.id.textViewKamera);
         sync = (TextView) findViewById(R.id.textViewSync);
+        textViewKamera = (TextView) findViewById(R.id.textViewKamera);
         log = (TextView) findViewById(R.id.log);
         log.setMovementMethod(new ScrollingMovementMethod());
         seekbar = (SeekBar) findViewById(R.id.seekBar);
@@ -89,8 +89,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //Tread Management
-        //StatusControll sc = new StatusControll();
-        //sc.start();
 
     }
 
@@ -98,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         NXT_USB.open(getIntent());
     }
+    StatusControll sc = new StatusControll();
 
 
 
@@ -111,12 +110,13 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(MainActivity.this,MainActivity.class));
     }
 
-   // FarbErkennung fb = new FarbErkennung();
 
     public void btnStart(View v){
-    //    fb.start();
         Fahren fahr = new Fahren();
         fahr.start();
+        sc.start();
+
+
     }
 
     public void btnStop(View v){
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             rob = new Robot();
             a = new Motor(nxt,Port.PORTA,Mode.MOTORON_BREAK_REGULATED,RegulationMode.SYNC,RunState.RUNNING);
             b = new Motor(nxt,Port.PORTB,Mode.MOTORON_BREAK_REGULATED,RegulationMode.SYNC,RunState.RUNNING);
-            rob.setSpeed((byte)30);
+            rob.setSpeed((byte)40);
             rob.addMotor(a);
             rob.addMotor(b);
 
@@ -141,64 +141,34 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
+           rob.moveFor();
 
-            rob.moveFor();
             while (true) {
-                        switch (mPreview.isFarbe()){
-                            case UNDEFINIERT:
 
+                        switch (mPreview.isFarbe()){
+
+                            case UNDEFINIERT:
                                 break;
                             case GRUEN:
                                 rob.stop();
-                                rob.playGefunden();
                                 break;
-                            case ROT:
+                            case ROT_LINKS:
                                 rob.moveBack();
-                                rob.turn(60);
+                                rob.turn_LINKS((int)(Math.random()*90+40));
                                 rob.moveFor();
-
+                                break;
+                            case ROT_RECHTS:
+                                rob.moveBack();
+                                rob.turn_RECHTS((int)(Math.random()*90+40));
+                                rob.moveFor();
                                break;
                         }
-                    }
+                                            }
             }
 
 
     }
-/*
-    class FarbErkennung extends Thread {
-        private static final String TAG = "MainActivity";
-        @Override
-        public void run() {
-            while (true) {
-                if(this.isInterrupted()){return;}
-                kameraHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
 
-                        TextView textViewKamera = (TextView) findViewById(R.id.textViewKamera);
-                        switch (mPreview.isFarbe()){
-                            case UNDEFINIERT:
-                                textViewKamera.setText("undefiniert");
-                                break;
-                            case GRUEN:
-                                textViewKamera.setText("Grün");
-                                break;
-                            case ROT:
-                                textViewKamera.setText("Rot");
-                                break;
-                        }
-                    }
-
-                });
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-*/
     //
     class StatusControll extends Thread{
         private static final String TAG = "MainActivity";
@@ -208,10 +178,39 @@ public class MainActivity extends AppCompatActivity {
                 mainHandler.post(new Runnable() {
                     @Override
                     public void run() {
+
+                        int [] aktuell = new int[3];
+                        switch (mPreview.isFarbe()){
+
+                            case UNDEFINIERT:
+                                aktuell = mPreview.Farbe(100,100);
+
+                                textViewKamera.setText("undefiniert \nRot:"+aktuell[0] + " Grün:" + aktuell[1] +" Blau:"+aktuell[2]);
+                                break;
+                            case GRUEN:
+                                aktuell = mPreview.Farbe(100,100);
+
+                                textViewKamera.setText("Grün \nRot:"+aktuell[0] + " Grün:" + aktuell[1] +" Blau:"+aktuell[2]);
+
+                                break;
+                            case ROT_LINKS:
+                                aktuell = mPreview.Farbe(100,100);
+
+                                textViewKamera.setText("Rot_LINKS\nRot:"+aktuell[0] + " Grün:" + aktuell[1] +" Blau:"+aktuell[2]);
+                                break;
+                            case ROT_RECHTS:
+                                aktuell = mPreview.Farbe(100,100);
+
+                                textViewKamera.setText("Rot_RECHTS\nRot:"+aktuell[0] + " Grün:" + aktuell[1] +" Blau:"+aktuell[2]);
+
+
+                                break;
+                        }
+
+
                         battery.setProgress(getBattery());
                        // speed.setText(rob.getSpeed() + "%");
                         status.setText(NXT_USB.isConnected()?"aktiv":"inaktiv");
-                        strecke.setText("");
                         sync.setText(Motor.isSync()?"aktiv":"inaktiv");
                     }
                 });
