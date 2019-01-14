@@ -2,6 +2,7 @@ package com.example.moritz.android_robot_project;
 
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.camera2.CameraManager;
 import android.hardware.usb.UsbManager;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,9 @@ import com.example.moritz.android_robot_project.Enums.RegulationMode;
 import com.example.moritz.android_robot_project.Enums.RunState;
 import android.hardware.Camera;
 
+
+import java.security.Policy;
+
 import static com.example.moritz.android_robot_project.CameraPreview.getCameraInstance;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView status;
     private TextView textViewKamera;
     private TextView sync;
-    private TextView log;
     private SeekBar seekbar ;
     private Handler mainHandler = new Handler();
     private Handler kameraHandler = new Handler();
@@ -57,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
         //mPreview.onPreviewFrame(a, mCamera);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
+        mCamera.setDisplayOrientation(90);
+        Camera.Parameters p = mCamera.getParameters();
+        p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        mCamera.setParameters(p);
+
 
         NXT_USB = new USB();
         NXT_USB.init((UsbManager) getSystemService(Context.USB_SERVICE));
@@ -67,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
         status = (TextView) findViewById(R.id.textViewStat);
         sync = (TextView) findViewById(R.id.textViewSync);
         textViewKamera = (TextView) findViewById(R.id.textViewKamera);
-        log = (TextView) findViewById(R.id.log);
-        log.setMovementMethod(new ScrollingMovementMethod());
         seekbar = (SeekBar) findViewById(R.id.seekBar);
       //  seekbar.setProgress(rob.getSpeed());
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -120,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void btnStop(View v){
+
     }
 
 
