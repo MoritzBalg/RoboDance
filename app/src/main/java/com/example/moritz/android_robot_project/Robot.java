@@ -6,8 +6,9 @@ import java.util.ArrayList;
 public class Robot {
     private ArrayList<Motor> motoren = new ArrayList<>();
     //private Sensor[] sensors;
-    private boolean running;
+    public boolean running;
     private byte speed;
+
 
     public void addMotor(Motor motor){
         motoren.add(motor);
@@ -26,10 +27,20 @@ public class Robot {
 
     }
 
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
     public void moveBack(){
+        this.running = true;
         int ticks = (int)(360);
         Motor a = motoren.get(0);
         Motor b = motoren.get(1);
+
         int state = a.getRotation();
         a.start((byte) -50);
         b.start((byte) -50);
@@ -37,7 +48,7 @@ public class Robot {
         }
         a.stop();
         b.stop();
-
+        this.running = false;
     }
 
     public void stop(){
@@ -48,6 +59,7 @@ public class Robot {
     }
 
     public void turn_RECHTS(int degrees){
+        this.running = true;
         stop();
         int ticks = (int)(2.02*(double)degrees);
         Motor a = motoren.get(0);
@@ -61,10 +73,11 @@ public class Robot {
         a.stop();
         b.stop();
         Motor.setSync(true);
-
+        this.running = false;
     }
 
     public void turn_LINKS(int degrees){
+        this.running = true;
         stop();
         int ticks = (int)(2.02*(double)degrees);
         Motor a = motoren.get(0);
@@ -78,7 +91,7 @@ public class Robot {
         a.stop();
         b.stop();
         Motor.setSync(true);
-
+        this.running = true;
     }
 
 
@@ -95,7 +108,7 @@ public class Robot {
 
     public void playGefunden() {
         NXT nxt = NXT.getInstance();
-        nxt.playTone(400,300);
+        nxt.playTone();
     }
 
 

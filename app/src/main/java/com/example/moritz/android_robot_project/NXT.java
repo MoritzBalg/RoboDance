@@ -29,21 +29,19 @@ public class NXT {
 
 
 
-    public byte[] playTone(int frequenz, int dauer){
+    public byte[] playTone(){
         byte[] outBytes = new byte[6];
         byte[] inBytes = new byte[3];
         if(nxtUsb.isConnected()){
-        int [] freq = toHex(frequenz,2);
-        int [] duration = toHex(dauer,2);
             //fixe Bytes
             outBytes[0] = (byte) (0x00);
             outBytes[1] = (byte) (0x03);
             //Frequenz
-            outBytes[2] = (byte) freq[0];
-            outBytes[3] = (byte) freq[1];
+            outBytes[2] = (byte) 0x02;
+            outBytes[3] = (byte) 0x00;
             //Dauer
-            outBytes[4] = (byte) duration[0];
-            outBytes[5] = (byte) duration[1];
+            outBytes[5] = (byte) 0x0c;
+            outBytes[4] = (byte) 0x00;
 
             boolean res = nxtUsb.command(outBytes, outBytes.length, inBytes, inBytes.length);
         }

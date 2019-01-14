@@ -178,9 +178,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             for(int j =0; j<frameHeight; j+=100){
                 int[] color = Farbe(i,j);
                 if(color[0] > 200&&color[1]< 100 && color[2]<100){
+
                     if(i>(int)(frameWidth/2)) {
                         return Farbe.ROT_RECHTS;
-                    }else{
+                    }else {
                         return Farbe.ROT_LINKS;
                     }
                 }

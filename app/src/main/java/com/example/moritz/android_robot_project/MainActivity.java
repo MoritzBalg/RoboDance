@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         NXT_USB.open(getIntent());
     }
-    StatusControll sc = new StatusControll();
+    //StatusControll sc = new StatusControll();
 
 
 
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     public void btnStart(View v){
         Fahren fahr = new Fahren();
         fahr.start();
-        sc.start();
+       // sc.start();
 
 
     }
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             rob = new Robot();
             a = new Motor(nxt,Port.PORTA,Mode.MOTORON_BREAK_REGULATED,RegulationMode.SYNC,RunState.RUNNING);
             b = new Motor(nxt,Port.PORTB,Mode.MOTORON_BREAK_REGULATED,RegulationMode.SYNC,RunState.RUNNING);
-            rob.setSpeed((byte)40);
+            rob.setSpeed((byte)50);
             rob.addMotor(a);
             rob.addMotor(b);
 
@@ -151,25 +151,40 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case GRUEN:
                                 rob.stop();
+                                rob.playGefunden();
+                                return;
+                            case ROT_RECHTS:
+                                if(!rob.isRunning()) {
+                                    rob.stop();
+                                    rob.moveBack();
+                                    rob.stop();
+                                    rob.turn_RECHTS((int) (Math.random() * 90 + 40));
+                                    rob.stop();
+                                    rob.moveFor();
+                                }
+
                                 break;
                             case ROT_LINKS:
-                                rob.moveBack();
-                                rob.turn_LINKS((int)(Math.random()*90+40));
-                                rob.moveFor();
-                                break;
-                            case ROT_RECHTS:
-                                rob.moveBack();
-                                rob.turn_RECHTS((int)(Math.random()*90+40));
-                                rob.moveFor();
+                                if(!rob.isRunning()) {
+                                    rob.stop();
+                                    rob.moveBack();
+                                    rob.stop();
+                                    rob.turn_LINKS((int) (Math.random() * 90 + 40));
+                                    rob.stop();
+                                    rob.moveFor();
+                                }
                                break;
                         }
+                        rob.running = false;
                                             }
             }
 
 
     }
 
-    //
+
+    /*
+
     class StatusControll extends Thread{
         private static final String TAG = "MainActivity";
         @Override
@@ -235,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
             return 0;
         }
     }
+    */
 }
 
 
