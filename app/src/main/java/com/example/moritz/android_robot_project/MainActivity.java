@@ -126,9 +126,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void btnStop(View v){
-
+        FarbErkennung farb = new FarbErkennung();
+        farb.start();
     }
 
+    Farbe akt = Farbe.UNDEFINIERT;
+    class FarbErkennung extends Thread {
+        public void run() {
+
+            while (true) {
+            akt = mPreview.isFarbe();            }
+        }
+    }
 
 
     class Fahren extends Thread {
@@ -152,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
             while (true) {
 
-                        switch (mPreview.isFarbe()){
+                        switch (akt){
 
                             case UNDEFINIERT:
                                 break;

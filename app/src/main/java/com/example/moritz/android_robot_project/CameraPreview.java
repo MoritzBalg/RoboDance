@@ -175,14 +175,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         Foto();
         //0 = Nichts; 1 = Gruen; 2 = Rot
         for(int i = 0; i<frameWidth; i+=5){
-            for(int j =0; j<frameHeight; j+=100){
+            for(int j =(int)((frameHeight/5)*3); j<frameHeight; j+=3){
                 int[] color = Farbe(i,j);
                 if(color[0] > 200&&color[1]< 100 && color[2]<100){
-
-                    if(i>(int)(frameWidth/2)) {
-                        return Farbe.ROT_RECHTS;
-                    }else {
+                    if(i>(int)(frameWidth/2)+200) {
                         return Farbe.ROT_LINKS;
+                    }else if(i<(int)(frameWidth/2)-200){
+                        return Farbe.ROT_RECHTS;
                     }
                 }
                 if(color[0] < 100&&color[1]> 150 && color[2]<100){
