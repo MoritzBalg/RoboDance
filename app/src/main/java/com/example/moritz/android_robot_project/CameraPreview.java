@@ -184,7 +184,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                         return Farbe.ROT_RECHTS;
                     }
                 }
-                if(color[0] < 100&&color[1]> 150 && color[2]<100){
+                if(color[0] < 130&&color[1]> 150 && color[2]<50){
                     return Farbe.GRUEN;
                 }
             }

@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
     public void btnStart(View v){
         Fahren fahr = new Fahren();
         fahr.start();
-       // sc.start();
+       //
 
 
     }
@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
     public void btnStop(View v){
         FarbErkennung farb = new FarbErkennung();
         farb.start();
+        //sc.start();
     }
 
     Farbe akt = Farbe.UNDEFINIERT;
@@ -199,8 +200,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    /*
 
+/*
     class StatusControll extends Thread{
         private static final String TAG = "MainActivity";
         @Override
@@ -266,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
             return 0;
         }
     }
-    */
+*/
 }
 
 
