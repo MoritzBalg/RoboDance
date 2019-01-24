@@ -24,6 +24,7 @@ import android.hardware.Camera;
 
 
 import java.security.Policy;
+import java.util.Random;
 
 import static com.example.moritz.android_robot_project.CameraPreview.getCameraInstance;
 
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         NXT_USB.open(getIntent());
     }
-    //StatusControll sc = new StatusControll();
+    StatusControll sc = new StatusControll();
 
 
 
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
     public void btnStop(View v){
         FarbErkennung farb = new FarbErkennung();
         farb.start();
-        //sc.start();
+        sc.start();
     }
 
     Farbe akt = Farbe.UNDEFINIERT;
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
                                     rob.stop();
                                     rob.moveBack();
                                     rob.stop();
-                                    rob.turn_RECHTS((int) (Math.random() * 90 + 40));
+                                    rob.turn_RECHTS(getRandomNumberInRange(30,110));
                                     rob.stop();
                                     rob.moveFor();
                                 }
@@ -186,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
                                     rob.stop();
                                     rob.moveBack();
                                     rob.stop();
-                                    rob.turn_LINKS((int) (Math.random() * 90 + 40));
+                                    rob.turn_LINKS(getRandomNumberInRange(30,110));
                                     rob.stop();
                                     rob.moveFor();
                                 }
@@ -196,13 +197,23 @@ public class MainActivity extends AppCompatActivity {
                                             }
             }
 
+        private int getRandomNumberInRange(int min, int max) {
+
+            if (min >= max) {
+                throw new IllegalArgumentException("max must be greater than min");
+            }
+
+            Random r = new Random();
+            return r.nextInt((max - min) + 1) + min;
+        }
+
 
     }
 
 
 
-/*
-    class StatusControll extends Thread{
+
+class StatusControll extends Thread{
         private static final String TAG = "MainActivity";
         @Override
         public void run() {
@@ -267,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
             return 0;
         }
     }
-*/
+
 }
 
 
