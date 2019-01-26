@@ -41,7 +41,7 @@ public class USB
     public void open(Intent intent)
     {
         String action = intent.getAction();
-        UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+        UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
         if( UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action) )
         {
             setDevice(device);
@@ -139,10 +139,7 @@ public class USB
         if( res == outSize )
         {
             res = mConnection.bulkTransfer(epIN, inBytes, inSize, 100);
-            if( res == inSize )
-            {
-                return (true);
-            }
+            return res == inSize;
         }
         return( false );
     }

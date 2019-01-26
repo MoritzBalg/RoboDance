@@ -15,31 +15,37 @@ import java.io.IOException;
 import static android.content.ContentValues.TAG;
 
 
-/** A basic Camera preview class */
+/**
+ * A basic Camera preview class
+ */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback, Camera.PreviewCallback {
+    int[] myPixels;
+    byte[] dataP;
+    int frameHeight;
+    int frameWidth;
+    Bitmap bmp;
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
-    public static Camera getCameraInstance(){
-        Camera c = null;
-        try {
-            c = Camera.open(); // attempt to get a Camera instance
-        }
-        catch (Exception e){
-            // Camera is not available (in use or does not exist)
-        }
-        return c; // returns null if camera is unavailable
-    }
     public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
-
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
         mHolder = getHolder();
         mHolder.addCallback(this);
         // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    }
+
+    public static Camera getCameraInstance() {
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+        } catch (Exception e) {
+            // Camera is not available (in use or does not exist)
+        }
+        return c; // returns null if camera is unavailable
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
@@ -60,7 +66,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
 
-        if (mHolder.getSurface() == null){
+        if (mHolder.getSurface() == null) {
             // preview surface does not exist
             return;
         }
@@ -68,7 +74,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // stop preview before making changes
         try {
             mCamera.stopPreview();
-        } catch (Exception e){
+        } catch (Exception e) {
             // ignore: tried to stop a non-existent preview
         }
 
@@ -80,18 +86,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.d(TAG, "Error starting camera preview: " + e.getMessage());
         }
     }
 
-    int[] myPixels;
-    byte[] dataP;
     @Override
     public void onPreviewFrame(byte[] data, Camera camera) {
         dataP = data;
-       // android.util.Log.d("onPreviewFrame", "called");
-
         int frameHeight = camera.getParameters().getPreviewSize().height;
         int frameWidth = camera.getParameters().getPreviewSize().width;
         // number of pixels//transforms NV21 pixel data into RGB pixels
@@ -102,7 +104,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public int[] decodeYUV420SP(int[] rgb, byte[] yuv420sp, int width, int height) {
-
         // here we're using our own internal PImage attributes
         final int frameSize = width * height;
 
@@ -144,11 +145,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return rgb;
     }
 
-    int frameHeight;
-    int frameWidth;
-    Bitmap bmp;
 
-    public void Foto(){
+
+    public void Foto() {
+        /*
+         Wir erstellen mithilfe der Höhe und der Breite des Bildes
+         eine Bitmap, in der jeder Pixel als rgb Wert gespeichret wird.
+         */
+
         frameHeight = mCamera.getParameters().getPreviewSize().height;
         frameWidth = mCamera.getParameters().getPreviewSize().width;
         int rgb[] = new int[frameWidth * frameHeight];
@@ -158,37 +162,50 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
 
     public int[] Farbe(int x, int y) {
-
-        int pixel = bmp.getPixel(x,y);
+        /*
+        Es werden die x und y Koordinaten des Bildes übergeben,
+        von denen man den rgb Wert haben möchte.
+        Der Rot, Blau und Grün anteil des Pixels wird dann
+        bestimmt und in ein rgbE Array geschrieben, in dem sich
+        dann die einzelne Bestandteile der Farbe in Rot, Grün und Blau
+        dann befinden.
+         */
+        int pixel = bmp.getPixel(x, y);
         int redValue = Color.red(pixel);
-        int blueValue = Color.blue(pixel);
         int greenValue = Color.green(pixel);
-        int color = Color.rgb(redValue, greenValue, blueValue);
+        int blueValue = Color.blue(pixel);
         int rgbE[] = {redValue, greenValue, blueValue};
         return rgbE;
     }
 
 
-
-
-     public Farbe isFarbe(){
-        Foto();
-        //0 = Nichts; 1 = Gruen; 2 = Rot
-        for(int i = 0; i<frameWidth; i+=5){
-            for(int j =(int)((frameHeight/5)*3); j<frameHeight; j+=3){
-                int[] color = Farbe(i,j);
-                if(color[0] > 200&&color[1]< 100 && color[2]<100){
-                    if(i>(int)(frameWidth/2)+200) {
+    public Farbe isFarbe() {
+        /*
+        Die Methode liefert die Farbe Rot oder Grün, sobald
+        sich ein Roter oder ein Grüner Pixel im Bild befindet.
+         */
+        Foto(); //Bitmap wird erzeugt vom Kamerabild
+        for (int i = 0; i < frameWidth; i += 5) {
+            //Wir nehmen nur jede 5. Spalte, da wir sont keine gute Performance aufzeichnen und es reicht jede 5. Zeile nur zu checken.
+            for (int j = (frameHeight / 5) * 3; j < frameHeight; j += 3) {
+                //Wir nehmen nur den oberen Bereich des Bildes, da wir dadurch an Performance sparen.
+                int[] color = Farbe(i, j);
+                if (color[0] > 200 && color[1] < 100 && color[2] < 100) {
+                    if (i > frameWidth / 2 + 200) {
+                        //Liefert den Wert ROT_LINKS, wenn sich ein Roter Pixel links im Bild befindet
                         return Farbe.ROT_LINKS;
-                    }else if(i<(int)(frameWidth/2)-200){
+                    } else if (i < frameWidth / 2 - 200) {
+                        //Liefert den Wert ROT_RECHTS, wenn sich ein Roter Pixel rechts im Bild befindet
                         return Farbe.ROT_RECHTS;
                     }
                 }
-                if(color[0] < 130&&color[1]> 150 && color[2]<50){
+                if (color[0] < 130 && color[1] > 150 && color[2] < 50) {
+                    //Liefert den Wert GRUEN, wenn sich im Bereich ein Grüner Pixel befindet.
                     return Farbe.GRUEN;
                 }
             }
         }
+        //Wenn es weder einen Roten noch einen Grünen Pixel im Bereich gibt, wird die Farbe UNDEFINIERT zurück geliefert.
         return Farbe.UNDEFINIERT;
     }
 
